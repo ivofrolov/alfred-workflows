@@ -1,0 +1,55 @@
+#!/usr/bin/env awk -f
+
+# Generates random 3-word passphrase using EFF's long wordlist (see https://www.eff.org/dice)
+# Reservoir sampling algorithm is used
+
+# Joins array elements with sep in between (assumes array indicies are numeric)
+function join(array, start, end, sep)
+{
+    if (sep == "")
+        sep = " "
+    else if (sep == SUBSEP)  # magic value
+        sep = ""
+    result = array[start]
+    for (i = start + 1; i <= end; i++)
+        result = result sep array[i]
+    return result
+}
+
+# Returns random 4-byte integer from /dev/urandom
+function random_seed()
+{
+    seed_generator = "od -v -An -D -N4 < /dev/urandom | tr -d '[:space:]'"
+    seed_generator | getline seed
+    close(seed_generator)
+    return int(seed)
+}
+
+BEGIN {
+    ARGV[1] = "eff_large_wordlist.txt"
+    ARGC = 2
+    
+    FS = "\t"
+    OFS = "-"
+
+    srand(random_seed())
+
+    words = 3
+}
+
+NR <= words {
+    passphrase[NR - 1] = $2
+    next
+}
+
+{
+    sample = int(NR * rand())
+}
+
+sample < words {
+    passphrase[sample] = $2
+}
+
+END {
+    print join(passphrase, 0, words - 1, OFS)
+}
