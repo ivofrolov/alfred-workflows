@@ -1,4 +1,4 @@
-## Alfred Wolfram Answers
+# Alfred Wolfram Answers
 
 [Download latest release](https://github.com/ivofrolov/alfred-workflows/releases/latest/download/Wolfram-Answers.alfredworkflow)
 

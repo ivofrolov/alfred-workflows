@@ -1,4 +1,4 @@
-## Alfred Yandex Translate
+# Alfred Yandex Translate
 
 [Download latest release](https://github.com/ivofrolov/alfred-workflows/releases/latest/download/Yandex-Translate.alfredworkflow)
 
