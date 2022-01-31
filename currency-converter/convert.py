@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 
+import argparse
 import datetime
 import decimal
+from functools import wraps
 import json
+from pathlib import Path
+import sys
+from typing import Callable, Dict
 import urllib.request
 import xml.etree.ElementTree as ET
-from functools import wraps
-from pathlib import Path
-from typing import Callable, Dict
 
 
 LOCAL_CURRENCY = 'rub'
@@ -15,9 +17,8 @@ MOSCOW_TZ = datetime.timezone(datetime.timedelta(hours=3), name='Europe/Moscow')
 RATES_PATH = 'rates.xml'
 
 
-def day_cached(filepath: str, tz: datetime.tzinfo = None) -> Callable:
-    """Caches decorated function return value bytes in file for a day."""
-    filepath = Path(filepath)
+def day_cached(filepath: Path, tz: datetime.tzinfo = None) -> Callable:
+    """Caches decorated function return value in file for a day."""
 
     def decorator(func: Callable[..., bytes]) -> Callable:
         @wraps(func)
@@ -40,19 +41,16 @@ def day_cached(filepath: str, tz: datetime.tzinfo = None) -> Callable:
 
 
 def parse_number(value: str) -> decimal.Decimal:
+    cleaned_value = value.replace(',', '.')
     try:
-        cleaned_value = value.replace(',', '.')
-        number = decimal.Decimal(cleaned_value)
+        return decimal.Decimal(cleaned_value)
     except decimal.InvalidOperation:
         raise ValueError(
-            'invalid number {0} - it should conform 3.14 or 3,14 format'.format(
-                cleaned_value
-            )
+            f'invalid number {value} - it should conform 3.14 or 3,14 format'
         )
-    return number
 
 
-@day_cached(filepath=RATES_PATH, tz=MOSCOW_TZ)
+@day_cached(filepath=Path(RATES_PATH), tz=MOSCOW_TZ)
 def get_cbr_rates() -> bytes:
     """Returns cbr.ru exchange rates xml text."""
     url = 'http://www.cbr.ru/scripts/XML_daily_eng.asp'
@@ -125,9 +123,6 @@ def convert(
 
 
 if __name__ == '__main__':
-    import argparse
-    import sys
-
     parser = argparse.ArgumentParser(
         description='Converts an amount from one currency to another.'
     )

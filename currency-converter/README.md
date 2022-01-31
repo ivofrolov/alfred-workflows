@@ -2,7 +2,7 @@
 
 [Download latest release](https://github.com/ivofrolov/alfred-workflows/releases/latest/download/Currency-Converter.alfredworkflow)
 
-Alfred 3 workflow for currency converting using daily rates by [The Central Bank of the Russian Federation](http://www.cbr.ru/development/).
+Alfred workflow for currency converting using daily rates by [The Central Bank of the Russian Federation](http://www.cbr.ru/development/).
 
 Local currency used is Russian Rouble -- ₽.
 
