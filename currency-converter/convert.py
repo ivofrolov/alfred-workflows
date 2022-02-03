@@ -5,6 +5,7 @@ import datetime
 import decimal
 from functools import wraps
 import json
+import os
 from pathlib import Path
 import sys
 from typing import Callable, Dict
@@ -14,7 +15,7 @@ import xml.etree.ElementTree as ET
 
 LOCAL_CURRENCY = 'rub'
 MOSCOW_TZ = datetime.timezone(datetime.timedelta(hours=3), name='Europe/Moscow')
-RATES_PATH = 'rates.xml'
+RATES_FILENAME = 'rates.xml'
 
 
 def day_cached(filepath: Path, tz: datetime.tzinfo = None) -> Callable:
@@ -23,6 +24,7 @@ def day_cached(filepath: Path, tz: datetime.tzinfo = None) -> Callable:
     def decorator(func: Callable[..., bytes]) -> Callable:
         @wraps(func)
         def wrapper(*args, **kwargs):
+            filepath.parent.mkdir(exist_ok=True)
             if filepath.exists():
                 modified = datetime.datetime.fromtimestamp(
                     filepath.stat().st_mtime, tz=tz
@@ -50,7 +52,10 @@ def parse_number(value: str) -> decimal.Decimal:
         )
 
 
-@day_cached(filepath=Path(RATES_PATH), tz=MOSCOW_TZ)
+@day_cached(
+    filepath=Path(os.getenv('alfred_workflow_cache', '.')) / RATES_FILENAME,
+    tz=MOSCOW_TZ,
+)
 def get_cbr_rates() -> bytes:
     """Returns cbr.ru exchange rates xml text."""
     url = 'http://www.cbr.ru/scripts/XML_daily_eng.asp'
