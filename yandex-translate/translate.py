@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
 import argparse
+from itertools import chain
 import json
 import os
-from typing import Iterable, Iterator, NamedTuple
+from typing import Iterable, Iterator, List, NamedTuple
 from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
@@ -19,15 +20,15 @@ class DictionaryError(Exception):
 
 class DictionaryResult(NamedTuple):
     definition: str
-    description: str = ''
-    addition: str = ''
+    synonyms: List[str] = []
+    meanings: List[str] = []
 
     def __str__(self) -> str:
         result = self.definition
-        if self.description:
-            result += f' ({self.description})'
-        if self.addition:
-            result += f'\n{self.addition}'
+        if self.synonyms:
+            result = ', '.join([result] + self.synonyms)
+        if self.meanings:
+            result += '\n' + ', '.join(self.meanings)
         return result
 
 
@@ -36,33 +37,22 @@ def alfred_output(query: str, results: Iterable[DictionaryResult]) -> str:
 
     for result in results:
         title = result.definition
-        if result.description:
-            title += f' ({result.description})'
+        if result.synonyms:
+            title = ', '.join([title] + result.synonyms)
 
-        largetype = title
-        if result.addition:
-            largetype += f'\n\n{result.addition}'
+        subtitle = ', '.join(result.meanings)
+
+        largetype = title + '\n' + subtitle
 
         items.append(
             {
                 'arg': query,
                 'title': title,
-                'subtitle': result.addition,
+                'subtitle': subtitle,
                 'text': {'copy': result.definition, 'largetype': largetype},
             }
         )
 
-    return json.dumps({'items': items}, ensure_ascii=False)
-
-
-def alfred_error(query: str, message: str) -> str:
-    items = [
-        {
-            'arg': query,
-            'title': message,
-            'text': {'copy': message, 'largetype': message},
-        },
-    ]
     return json.dumps({'items': items}, ensure_ascii=False)
 
 
@@ -77,18 +67,18 @@ def lookup(
             dict_result = json.load(response)
             for definition in dict_result['def']:
                 for translation in definition['tr']:
-                    means = [mean['text'] for mean in translation.get('mean', [])]
                     synonyms = [
                         synonym['text'] for synonym in translation.get('syn', [])
                     ]
+                    meanings = [mean['text'] for mean in translation.get('mean', [])]
                     yield DictionaryResult(
                         definition=translation['text'],
-                        description=', '.join(means),
-                        addition=', '.join(synonyms),
+                        synonyms=synonyms,
+                        meanings=meanings,
                     )
     except HTTPError as exc:
         error = json.load(exc)
-        raise DictionaryError(error['message'])
+        raise DictionaryError(error['message']) from exc
 
 
 def translate(
@@ -112,8 +102,8 @@ def translate(
         with urlopen(request) as response:
             text = json.load(response)['translations'][0]['text']
             yield DictionaryResult(definition=text)
-    except HTTPError as error:
-        raise DictionaryError(f'Error: {error.reason}')
+    except HTTPError as exc:
+        raise DictionaryError(f'Error: {exc.reason}') from exc
 
 
 if __name__ == '__main__':
@@ -129,28 +119,22 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    try:
-        if len(args.text.split()) == 1:
-            answers = lookup(
-                args.text,
-                args.source,
-                args.target,
-                api_key=os.getenv('YANDEX_DICTIONARY_API_KEY', ''),
-            )
-        else:
-            answers = translate(
-                args.text,
-                args.source,
-                args.target,
-                api_key=os.getenv('YANDEX_TRANSLATE_API_KEY', ''),
-            )
-    except DictionaryError as error:
-        if args.raw:
-            print(error)
-        else:
-            print(alfred_error(args.text, str(error)))
+    answers = chain(
+        translate(
+            args.text,
+            args.source,
+            args.target,
+            api_key=os.getenv('YANDEX_TRANSLATE_API_KEY', ''),
+        ),
+        lookup(
+            args.text,
+            args.source,
+            args.target,
+            api_key=os.getenv('YANDEX_DICTIONARY_API_KEY', ''),
+        ),
+    )
+
+    if args.raw:
+        print('\n\n'.join(map(str, answers)))
     else:
-        if args.raw:
-            print('\n\n'.join(map(str, answers)))
-        else:
-            print(alfred_output(args.text, answers))
+        print(alfred_output(args.text, answers))
