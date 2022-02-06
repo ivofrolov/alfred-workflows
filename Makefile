@@ -2,6 +2,8 @@ workflows = currency-converter passphrase-generator wolfram-answers yandex-trans
 
 py_sources = $(filter %.py,$(foreach dir,$(workflows),$(wildcard $(dir)/*)))
 
+changelog = CHANGELOG.md
+
 uppercase = $(shell echo $(1) | tr '[:lower:]' '[:upper:]')
 workflow_uid_var = $(addsuffix _WORKFLOW_UID,$(call uppercase,$(subst -,_,$(1))))
 
@@ -14,9 +16,14 @@ $(workflows):
 
 all: $(workflows) ## install workflows to Alfred directory
 
-help: 
-	# see https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
-	grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "%-10s %s\n", $$1, $$2}'
+release: ## bump version and publish release
+	$(eval tmpfile = $(shell mktemp -t `basename $(changelog)`))
+	awk -f prepare-changelog-for-release.awk $(changelog) > $(tmpfile)
+	mv $(tmpfile) $(changelog)
+	$(eval tag = $(shell head -1 $(changelog) | tr -d "# "))
+	git add $(changelog) && git commit -m "Releases $(tag)" && git push
+	awk "/# v[0-9]+/ && NR == 1 {next} /# v[0-9]+/ {exit} {print}" \
+		| gh release create -F - $(tag) assets/*.alfredworkflow
 
 format: ## format sources with black
 	black -S $(py_sources)
@@ -24,5 +31,9 @@ format: ## format sources with black
 lint:  ## lint codebase with flake8
 	pylint --disable="C0326,C0330" --max-line-length=88 $(py_sources)
 
-.PHONY .SILENT: help format lint all $(workflows)
+help: 
+	# see https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
+	grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "%-10s %s\n", $$1, $$2}'
+
+.PHONY .SILENT: help format lint release all $(workflows)
 .DEFAULT_GOAL := help
