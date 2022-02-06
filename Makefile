@@ -16,13 +16,15 @@ $(workflows):
 
 all: $(workflows) ## install workflows to Alfred directory
 
-release: ## bump version and publish release
+prepare: ## bump version
 	$(eval tmpfile = $(shell mktemp -t `basename $(changelog)`))
 	awk -f prepare-changelog-for-release.awk $(changelog) > $(tmpfile)
 	mv $(tmpfile) $(changelog)
+
+release: prepare ## publish release
 	$(eval tag = $(shell head -1 $(changelog) | tr -d "# "))
 	git add $(changelog) && git commit -m "Releases $(tag)" && git push
-	awk "/# v[0-9]+/ && NR == 1 {next} /# v[0-9]+/ {exit} {print}" \
+	awk "/# v[0-9]+/ && NR == 1 {next} /# v[0-9]+/ {exit} {print}" $(changelog) \
 		| gh release create -F - $(tag) assets/*.alfredworkflow
 
 format: ## format sources with black
@@ -35,5 +37,5 @@ help:
 	# see https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
 	grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "%-10s %s\n", $$1, $$2}'
 
-.PHONY .SILENT: help format lint release all $(workflows)
+.PHONY .SILENT: help format lint prepare release all $(workflows)
 .DEFAULT_GOAL := help

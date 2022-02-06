@@ -2,10 +2,9 @@ BEGIN {
     state = "guard"
 }
 
-# version number in file header means completed release
+# just print everything out when it's already released
 /# v[0-9]+/ && NR == 1 && state == "guard" {
-    print "already released" > "/dev/stderr"
-    exit 1
+    state = "write"
 }
 
 # do not allow to release when there are open issues
