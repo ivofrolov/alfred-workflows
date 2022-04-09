@@ -22,6 +22,13 @@ Just type `passphrase`.
 [Download latest release](https://github.com/ivofrolov/alfred-workflows/releases/latest/download/Passphrase-Generator.alfredworkflow)
 
 
+## VPN Commander
+
+Type `vpn <your service name>` to establish or break connection to the VPN service.
+
+[Download latest release](https://github.com/ivofrolov/alfred-workflows/releases/latest/download/Currency-Converter.alfredworkflow)
+
+
 ## Wolfram Answers
 
 Gives answers to questions about life, the universe and everything. [Wolfram|Alpha](https://www.wolframalpha.com/) powered.
