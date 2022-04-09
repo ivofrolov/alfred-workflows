@@ -26,7 +26,7 @@ Just type `passphrase`.
 
 Type `vpn <your service name>` to establish or break connection to the VPN service.
 
-[Download latest release](https://github.com/ivofrolov/alfred-workflows/releases/latest/download/Currency-Converter.alfredworkflow)
+[Download latest release](https://github.com/ivofrolov/alfred-workflows/releases/latest/download/VPN-Commander.alfredworkflow)
 
 
 ## Wolfram Answers

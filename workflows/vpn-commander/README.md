@@ -1,6 +1,6 @@
 # Alfred VPN Commander
 
-[Download latest release](https://github.com/ivofrolov/alfred-workflows/releases/latest/download/Currency-Converter.alfredworkflow)
+[Download latest release](https://github.com/ivofrolov/alfred-workflows/releases/latest/download/VPN-Commander.alfredworkflow)
 
 Type `vpn <your service name>` to establish or break connection to the VPN service.
 
