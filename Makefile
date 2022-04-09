@@ -1,11 +1,11 @@
-workflows = currency-converter passphrase-generator wolfram-answers yandex-translate
+workflows = $(shell find workflows -type d -depth 1 -not -name ".*")
 
 py_sources = $(filter %.py,$(foreach dir,$(workflows),$(wildcard $(dir)/*)))
 
 changelog = CHANGELOG.md
 
 uppercase = $(shell echo $(1) | tr '[:lower:]' '[:upper:]')
-workflow_uid_var = $(addsuffix _WORKFLOW_UID,$(call uppercase,$(subst -,_,$(1))))
+workflow_uid_var = $(addsuffix _WORKFLOW_UID,$(call uppercase,$(subst -,_,$(notdir $(1)))))
 
 $(workflows):
 	if test -z "$(ALFRED_PREFERENCES_FOLDER)" ; then echo "ALFRED_PREFERENCES_FOLDER is not defined" ; exit 1 ; fi
@@ -14,14 +14,14 @@ $(workflows):
 		$(filter-out %.md, $(wildcard $@/*)) \
 		"$(ALFRED_PREFERENCES_FOLDER)/workflows/$(value $(call workflow_uid_var,$@))/"
 
-all: $(workflows) ## install workflows to Alfred directory
+all: $(workflows)  ## install workflows to Alfred directory
 
-prepare: ## bump version
+prepare:  ## bump version
 	$(eval tmpfile = $(shell mktemp -t `basename $(changelog)`))
 	awk -f prepare-changelog-for-release.awk $(changelog) > $(tmpfile)
 	mv $(tmpfile) $(changelog)
 
-release: prepare ## publish release
+release: prepare  ## publish release
 	$(eval tag = $(shell head -1 $(changelog) | tr -d "# "))
 	git add $(changelog) && git commit -m "Releases $(tag)" && git push
 	awk "/# v[0-9]+/ && NR == 1 {next} /# v[0-9]+/ {exit} {print}" $(changelog) \
