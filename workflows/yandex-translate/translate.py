@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import argparse
-from itertools import chain
 import json
 import os
 from typing import Iterable, Iterator, List, NamedTuple
@@ -113,26 +112,31 @@ if __name__ == '__main__':
     parser.add_argument(
         '--raw', action='store_true', help='print result as plain text.'
     )
-    parser.add_argument('-s', '--source', help='source language code (en, ru, ...)')
-    parser.add_argument('-t', '--target', help='target language code (en, ru, ...)')
+    parser.add_argument(
+        '-s', '--source', required=True, help='source language code (en, ru, ...)'
+    )
+    parser.add_argument(
+        '-t', '--target', required=True, help='target language code (en, ru, ...)'
+    )
     parser.add_argument('text')
 
     args = parser.parse_args()
 
-    answers = chain(
-        translate(
-            args.text,
-            args.source,
-            args.target,
-            api_key=os.getenv('YANDEX_TRANSLATE_API_KEY', ''),
-        ),
+    answers = list(
         lookup(
             args.text,
             args.source,
             args.target,
             api_key=os.getenv('YANDEX_DICTIONARY_API_KEY', ''),
-        ),
+        )
     )
+    if not answers:
+        answers = translate(
+            args.text,
+            args.source,
+            args.target,
+            api_key=os.getenv('YANDEX_TRANSLATE_API_KEY', ''),
+        )
 
     if args.raw:
         print('\n\n'.join(map(str, answers)))
