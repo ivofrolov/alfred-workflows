@@ -1,4 +1,5 @@
-- [x] __[Yandex Translate]__ drop duplicate definitions.
+# v5
+__[Yandex Translate]__ drop duplicate definitions.
 
 # v4
 __[VPN Commander]__ connect vpn services from Alfred.
