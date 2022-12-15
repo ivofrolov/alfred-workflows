@@ -30,7 +30,7 @@ release: prepare  ## publish release
 format: ## format sources with black
 	black -S $(py_sources)
 
-lint:  ## lint codebase with flake8
+lint:  ## lint codebase with pylint
 	pylint --disable="C0326,C0330" --max-line-length=88 $(py_sources)
 
 help: 
