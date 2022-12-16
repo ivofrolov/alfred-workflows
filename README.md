@@ -2,6 +2,14 @@
 
 Icons by [Icons8](https://icons8.com).
 
+
+## Bluetooth Commander
+
+Type `bt <device name>` to connect or disconnect paired bluetooth device.
+
+[Download latest release](https://github.com/ivofrolov/alfred-workflows/releases/latest/download/Bluetooth-Commander.alfredworkflow)
+
+
 ## Currency Converter
 
 Converts currency using daily rates by [The Central Bank of the Russian Federation](http://www.cbr.ru/development/).
