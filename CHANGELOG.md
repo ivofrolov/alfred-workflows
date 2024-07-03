@@ -1,17 +1,20 @@
+# v7
+[ ] __[VPN Commander]__ Add service identifier to help Alfred order entries.
+
 # v6
-__[Bluetooth Commander]__ connect bluetooth devices from Alfred
+__[Bluetooth Commander]__ Connect bluetooth devices from Alfred.
 
 # v5
-__[Yandex Translate]__ drop duplicate definitions.
+__[Yandex Translate]__ Drop duplicate definitions.
 
 # v4
-__[VPN Commander]__ connect vpn services from Alfred.
+__[VPN Commander]__ Connect to vpn services from Alfred.
 
 # v3
-__[Yandex Translate]__ [Yandex Dictionary](https://yandex.ru/dev/dictionary/doc/dg/reference/lookup.html) support
+__[Yandex Translate]__ [Yandex Dictionary](https://yandex.ru/dev/dictionary/doc/dg/reference/lookup.html) support.
 
 # v2
-__[Woflram Answers]__ curl inside.
+__[Woflram Answers]__ Curl inside.
 
 # v1
 Initial Release.
