@@ -28,10 +28,10 @@ release: prepare  ## publish release
 		| gh release create -F - $(tag) assets/*.alfredworkflow
 
 format: ## format sources with black
-	black -S $(py_sources)
+	ruff format $(py_sources)
 
-lint:  ## lint codebase with pylint
-	pylint --disable="C0326,C0330" --max-line-length=88 $(py_sources)
+lint:  ## lint codebase with ruff
+	ruff check --output-format pylint $(py_sources)
 
 help: 
 	# see https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
