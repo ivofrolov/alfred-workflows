@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
+import os
 import json
 import re
 import subprocess
-from typing import Iterable, Iterator, Literal, NamedTuple
+from typing import Iterable, Iterator, Literal, NamedTuple, Tuple
 
 
 class VpnService(NamedTuple):
@@ -12,7 +13,10 @@ class VpnService(NamedTuple):
     uid: str
 
 
-def get_vpn_services(filter_: str) -> Iterator[VpnService]:
+def get_vpn_services(
+    protocol_filter: str,
+    excluded_services: Tuple[str],
+) -> Iterator[VpnService]:
     command = ["scutil", "--nc", "list"]
     process = subprocess.run(command, capture_output=True, text=True, check=True)
     pattern = re.compile(
@@ -28,15 +32,17 @@ def get_vpn_services(filter_: str) -> Iterator[VpnService]:
         \s+
         \((?:[\w.]+)\)
         \s+
-        "(?P<name>\S+)"
+        "(?P<name>.+)"
         \s+
-        \[{filter_}\]
+        \[{protocol_filter}.+\]
         $
         """,
         re.X,
     )
     for line in process.stdout.splitlines():
         if match := re.match(pattern, line):
+            if match["name"] in excluded_services:
+                continue
             yield VpnService(
                 state=match["state"].lower(),
                 name=match["name"],
@@ -63,5 +69,13 @@ def alfred_output(services: Iterable[VpnService]) -> str:
 
 
 if __name__ == "__main__":
-    services_filter = "(PPP:L2TP|VPN:.+)"
-    print(alfred_output(get_vpn_services(services_filter)))
+    protocol_filter = "(PPP:L2TP|VPN)"
+    excluded_services = tuple(os.getenv("EXCLUDED_SERVICES", "").split(","))
+    print(
+        alfred_output(
+            get_vpn_services(
+                protocol_filter=protocol_filter,
+                excluded_services=excluded_services,
+            )
+        )
+    )
