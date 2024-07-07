@@ -1,5 +1,8 @@
+# v8
+__[VPN Commander]__ Add service name filter.
+
 # v7
-[ ] __[VPN Commander]__ Add service identifier to help Alfred order entries.
+__[VPN Commander]__ Add service identifier to help Alfred order entries.
 
 # v6
 __[Bluetooth Commander]__ Connect bluetooth devices from Alfred.
