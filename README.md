@@ -21,6 +21,17 @@ Type `cur 42 usd` to convert $42 to rubles or `cur 46 eur usd` to cross convert 
 [Download latest release](https://github.com/ivofrolov/alfred-workflows/releases/latest/download/Currency-Converter.alfredworkflow)
 
 
+## Files Finder
+
+Alfred file search workflow in case Spotlight indexing is disabled for some reason.
+
+Type `;` and query to search.
+
+Type `update application cache` to add new applications to Alfred cache.
+
+[Download latest release](https://github.com/ivofrolov/alfred-workflows/releases/latest/download/Files-Finder.alfredworkflow)
+
+
 ## Passphrase Generator
 
 Generates a passphrase using [EFF's Long Wordlist](https://www.eff.org/dice).
