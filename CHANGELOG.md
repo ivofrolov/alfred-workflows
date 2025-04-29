@@ -1,5 +1,5 @@
 # v9
-[ ] [Files Finder] New workflow.
+__[Files Finder]__ New workflow.
 
 # v8
 __[VPN Commander]__ Add service name filter.
