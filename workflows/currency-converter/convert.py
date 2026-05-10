@@ -13,6 +13,7 @@ import urllib.request
 import xml.etree.ElementTree as ET
 
 
+DEFAULT_TIMEOUT = 1  # seconds
 LOCAL_CURRENCY = 'rub'
 MOSCOW_TZ = datetime.timezone(datetime.timedelta(hours=3), name='Europe/Moscow')
 RATES_FILENAME = 'rates.xml'
@@ -59,7 +60,7 @@ def parse_number(value: str) -> decimal.Decimal:
 def get_cbr_rates() -> bytes:
     """Returns cbr.ru exchange rates xml text."""
     url = 'http://www.cbr.ru/scripts/XML_daily_eng.asp'
-    with urllib.request.urlopen(url) as response:
+    with urllib.request.urlopen(url, timeout=DEFAULT_TIMEOUT) as response:
         body = response.read()
         return body
 

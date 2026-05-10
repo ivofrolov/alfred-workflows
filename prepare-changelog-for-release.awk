@@ -7,7 +7,7 @@ BEGIN {
     state = "write"
 }
 
-# do not allow to release when there are open issues
+# do not allow to release if there are open issues
 /- \[ ?\] / && state == "guard" {
     print "not done" > "/dev/stderr"
     exit 1
