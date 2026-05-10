@@ -1,4 +1,5 @@
-- [x] __[Yandex Translate]__ Add requests timeout.
+# v10
+__[Yandex Translate]__ Add requests timeout.
 
 # v9
 __[Files Finder]__ New workflow.
